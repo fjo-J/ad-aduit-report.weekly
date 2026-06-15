@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>広告チェックAI 案件管理ダッシュボード 2026-06-08</title>
+<title>広告チェックAI 案件管理ダッシュボード 2026-06-15</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg:#0d1b2e; --card:#1a2744; --teal:#00b4d8; --teal2:#0096c7;
-    --green:#22c55e; --gold:#f4c842; --red:#ef4444;
+    --bg:#0d1b2e; --card:#1a2744;
+    --teal:#00b4d8; --green:#22c55e; --gold:#f4c842; --red:#ef4444;
     --text:#e2e8f0; --text2:#94a3b8; --border:rgba(0,180,216,0.18);
   }
   body { background:var(--bg); color:var(--text); font-family:Arial,'Arial Black','Hiragino Kaku Gothic ProN',Meiryo,sans-serif; padding:0 0 48px; }
@@ -20,12 +20,16 @@
   .header-left p { font-size:12px; color:var(--text2); margin-top:4px; }
   .header-right { display:flex; gap:9px; flex-wrap:wrap; align-items:center; }
   .badge { background:var(--teal); color:#fff; font-weight:700; font-size:12px; padding:5px 13px; border-radius:20px; white-space:nowrap; }
-  .badge-gold { background:var(--gold); color:#1a1a1a; }
+  .badge-gold  { background:var(--gold); color:#1a1a1a; }
   .badge-green { background:var(--green); color:#fff; }
 
   /* DIFF BANNER */
   .diff-banner { background:rgba(0,180,216,0.08); border-left:4px solid var(--teal); margin:16px 20px 0; border-radius:0 8px 8px 0; padding:10px 16px; font-size:12px; display:flex; flex-wrap:wrap; gap:14px; }
   .diff-item { display:flex; align-items:center; gap:5px; }
+
+  /* HOT BANNER (高優先) */
+  .hot-banner { background:rgba(34,197,94,0.1); border-left:4px solid var(--green); margin:10px 20px 0; border-radius:0 8px 8px 0; padding:10px 16px; font-size:12px; }
+  .hot-banner strong { color:var(--green); }
 
   /* LAYOUT */
   .container { max-width:1400px; margin:0 auto; padding:18px 20px 0; }
@@ -49,11 +53,11 @@
   .kpi-card.red   .kpi-value { color:var(--red); }
   .kpi-sub { font-size:10px; color:var(--text2); margin-top:4px; }
 
-  /* GRID */
-  .two-col   { display:grid; grid-template-columns:1fr 1fr;       gap:16px; margin-bottom:20px; }
-  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr;   gap:16px; margin-bottom:20px; }
+  /* GRIDS */
+  .two-col   { display:grid; grid-template-columns:1fr 1fr;     gap:16px; margin-bottom:20px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px; }
 
-  /* CHART CARDS */
+  /* CARDS */
   .chart-card { background:var(--card); border:1px solid var(--border); border-radius:11px; padding:16px; }
   .chart-card h3 { font-size:12px; color:var(--teal); margin-bottom:11px; font-family:'Arial Black',Arial,sans-serif; }
   .chart-wrap { position:relative; width:100%; }
@@ -65,16 +69,16 @@
 
   /* TABLE */
   .data-table { width:100%; border-collapse:collapse; font-size:12px; }
-  .data-table thead th { background:rgba(0,180,216,0.12); color:var(--teal); padding:6px 8px; text-align:left; font-size:11px; white-space:nowrap; }
-  .data-table tbody tr { border-bottom:1px solid rgba(255,255,255,0.05); }
-  .data-table tbody tr:hover { background:rgba(0,180,216,0.06); }
+  .data-table thead th { background:rgba(0,180,216,.12); color:var(--teal); padding:6px 8px; text-align:left; font-size:11px; white-space:nowrap; }
+  .data-table tbody tr { border-bottom:1px solid rgba(255,255,255,.05); }
+  .data-table tbody tr:hover { background:rgba(0,180,216,.06); }
   .data-table tbody td { padding:6px 8px; color:var(--text); }
 
   /* TAGS */
   .plan-tag { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; font-weight:700; }
   .plan-e  { background:rgba(244,200,66,.2); color:var(--gold); }
-  .plan-s  { background:rgba(0,180,216,.2); color:var(--teal); }
-  .plan-st { background:rgba(34,197,94,.2); color:var(--green); }
+  .plan-s  { background:rgba(0,180,216,.2);  color:var(--teal); }
+  .plan-st { background:rgba(34,197,94,.2);  color:var(--green); }
   .plan-m  { background:rgba(148,163,184,.2); color:var(--text2); }
   .status-tag { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; font-weight:700; }
   .st-active { background:rgba(34,197,94,.2);  color:var(--green); }
@@ -86,10 +90,10 @@
 
   /* FUNNEL */
   .funnel-list { list-style:none; }
-  .funnel-item { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:11px; }
+  .funnel-item { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:11px; }
   .funnel-item:last-child { border-bottom:none; }
   .funnel-label { flex:1; color:var(--text2); font-size:11px; }
-  .funnel-bar-wrap { width:110px; height:7px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; }
+  .funnel-bar-wrap { width:110px; height:7px; background:rgba(255,255,255,.08); border-radius:4px; overflow:hidden; }
   .funnel-bar { height:100%; border-radius:4px; }
   .funnel-count { width:30px; text-align:right; font-weight:700; font-size:12px; }
 
@@ -97,7 +101,7 @@
   .plan-breakdown { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
   .plan-row { display:flex; align-items:center; gap:9px; }
   .plan-name { width:85px; font-size:11px; color:var(--text2); }
-  .plan-bar-wrap { flex:1; height:19px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; }
+  .plan-bar-wrap2 { flex:1; height:19px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; }
   .plan-bar-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:7px; font-size:10px; font-weight:700; }
   .plan-meta { width:100px; text-align:right; font-size:10px; color:var(--text2); }
 
@@ -110,8 +114,8 @@
   .note { background:rgba(244,200,66,.08); border:1px solid rgba(244,200,66,.3); border-radius:8px; padding:8px 12px; font-size:11px; color:var(--gold); margin-top:9px; display:flex; align-items:flex-start; gap:6px; }
   .note::before { content:'ℹ️'; font-size:12px; }
 
-  /* HOT BADGE */
-  .hot { display:inline-block; background:rgba(168,85,247,.25); color:#a855f7; font-size:9px; font-weight:700; padding:1px 6px; border-radius:8px; margin-left:4px; vertical-align:middle; }
+  /* HOT ROW */
+  .hot-row { background:rgba(34,197,94,.07) !important; }
 
   /* RESPONSIVE */
   @media (max-width:1100px) { .kpi-row-6{grid-template-columns:repeat(3,1fr)} .kpi-row-4{grid-template-columns:repeat(2,1fr)} }
@@ -124,21 +128,24 @@
 <div class="header">
   <div class="header-left">
     <h1>📊 広告チェックAI 案件管理ダッシュボード</h1>
-    <p>データ取得日時：2026年6月8日（月）&nbsp;|&nbsp;Notion DB 全件同期済み（6ページ完了）</p>
+    <p>データ取得日時：2026年6月15日（月）&nbsp;|&nbsp;Notion DB 全件同期済み（6ページ完了）</p>
   </div>
   <div class="header-right">
-    <span class="badge badge-gold">総件数 422件</span>
+    <span class="badge badge-gold">総件数 423件</span>
     <span class="badge badge-green">継続利用中 12社</span>
-    <span class="badge">前回比 +2件</span>
+    <span class="badge">前回比 変更なし</span>
   </div>
 </div>
 
 <!-- DIFF BANNER -->
-<div class="diff-banner">
-  <div class="diff-item">🆕 <strong>有限会社秋月製作所</strong> 新規（アプローチ中 / Web広告 / 6/5）</div>
-  <div class="diff-item">🆕 <strong>名古屋大学医学部附属病院</strong> 新規（アプローチ中 / Web広告 / 6/5）</div>
-  <div class="diff-item">🆕 <strong>NTTアーバンバリューサポート㈱</strong> 新規（アプローチ中 / 紹介 / 6/8）</div>
-  <div class="diff-item">🆕 <strong style="color:#a855f7;">イオンペット㈱</strong> 新規＋<span class="st-first" style="font-size:11px;padding:1px 6px;border-radius:8px;background:rgba(168,85,247,.2);">初回商談確定</span> 商談日:6/10 / 景表法・薬機法</div>
+<div class="diff-banner" style="border-left-color:#64748b;background:rgba(100,116,139,0.08);">
+  <div class="diff-item" style="color:var(--text2);">📋 前回（6/11）比：<strong style="color:var(--text);">新規登録・ステータス変更なし</strong>　データは前回と同一です</div>
+  <div class="diff-item" style="color:var(--text2);">🎯 注目案件：<strong>イオンペット㈱</strong> 次回アクション 6/18（見積提出）</div>
+</div>
+
+<!-- HOT BANNER -->
+<div class="hot-banner">
+  🔥 <strong>イオンペット㈱ 今週の山場</strong>：6/18（木）に見積提出予定。月800回チェック・月額26〜29万円の大型案件。受注すればMRR +26万〜、ARR +312万円超。
 </div>
 
 <!-- MAIN -->
@@ -184,13 +191,13 @@
   <div class="kpi-row kpi-row-4 mb-20">
     <div class="kpi-card">
       <div class="kpi-label">総登録件数</div>
-      <div class="kpi-value">422件</div>
-      <div class="kpi-sub">前回(6/2)比 +2件</div>
+      <div class="kpi-value">423件</div>
+      <div class="kpi-sub">前回(6/11)比 変更なし</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-label">アクティブ商談数</div>
-      <div class="kpi-value">33件</div>
-      <div class="kpi-sub">イオンペット初回商談確定+1</div>
+      <div class="kpi-value">34件</div>
+      <div class="kpi-sub">イオンペット・ヘッドオフィス 進行中+2</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-label">失注累計</div>
@@ -213,22 +220,22 @@
       <div class="plan-breakdown">
         <div class="plan-row">
           <div class="plan-name"><span class="plan-tag plan-e">Enterprise</span></div>
-          <div class="plan-bar-wrap"><div class="plan-bar-fill" style="width:97%;background:linear-gradient(90deg,#f4c842,#d4a017);color:#1a1a1a;">¥390,000</div></div>
+          <div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:97%;background:linear-gradient(90deg,#f4c842,#d4a017);color:#1a1a1a;">¥390,000</div></div>
           <div class="plan-meta">2社 / avg ¥195,000</div>
         </div>
         <div class="plan-row">
           <div class="plan-name"><span class="plan-tag plan-s">Standard</span></div>
-          <div class="plan-bar-wrap"><div class="plan-bar-fill" style="width:98%;background:linear-gradient(90deg,#00b4d8,#0096c7);color:#fff;">¥385,000</div></div>
+          <div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:98%;background:linear-gradient(90deg,#00b4d8,#0096c7);color:#fff;">¥385,000</div></div>
           <div class="plan-meta">4社 / avg ¥96,250</div>
         </div>
         <div class="plan-row">
           <div class="plan-name"><span class="plan-tag plan-st">Starter</span></div>
-          <div class="plan-bar-wrap"><div class="plan-bar-fill" style="width:45%;background:linear-gradient(90deg,#22c55e,#16a34a);color:#fff;">¥175,000</div></div>
+          <div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:45%;background:linear-gradient(90deg,#22c55e,#16a34a);color:#fff;">¥175,000</div></div>
           <div class="plan-meta">5社 / avg ¥35,000</div>
         </div>
         <div class="plan-row">
           <div class="plan-name"><span class="plan-tag plan-m">保守</span></div>
-          <div class="plan-bar-wrap"><div class="plan-bar-fill" style="width:8%;background:rgba(148,163,184,.4);color:#e2e8f0;">¥30K</div></div>
+          <div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:8%;background:rgba(148,163,184,.4);color:#e2e8f0;">¥30K</div></div>
           <div class="plan-meta">1社 / ¥30,000</div>
         </div>
       </div>
@@ -256,7 +263,7 @@
           </tbody>
         </table>
       </div>
-      <div class="note">MRR ¥980,000（12社全社入力済み）　武内製薬手数料10%差引 → ネットMRR ¥976,500　｜　平均継続 <strong>7.2ヶ月</strong>（全12社・契約開始日より算出）　最長 武内製薬 <strong>16ヶ月</strong></div>
+      <div class="note">MRR ¥980,000（12社全社入力済み）　武内製薬手数料10%差引 → ネットMRR ¥976,500　｜　平均継続 <strong>7.2ヶ月</strong>（全12社）　最長 武内製薬 <strong>16ヶ月</strong></div>
     </div>
   </div>
 
@@ -265,17 +272,18 @@
   <div class="two-col mb-20">
 
     <div class="chart-card">
-      <h3>ステータスファネル（全422件）</h3>
+      <h3>ステータスファネル（全423件）</h3>
       <ul class="funnel-list">
         <li class="funnel-item"><span class="funnel-label">🔵 アプローチ中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:52%;background:#334155;"></div></div><span class="funnel-count" style="color:var(--text2);">96</span></li>
         <li class="funnel-item"><span class="funnel-label">🌀 長期フォロー</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#2a3f5f;"></div></div><span class="funnel-count" style="color:var(--text2);">180</span></li>
-        <li class="funnel-item"><span class="funnel-label">🟡 進行中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:9%;background:#00b4d8;"></div></div><span class="funnel-count" style="color:var(--teal);">8</span></li>
+        <li class="funnel-item"><span class="funnel-label" style="color:var(--teal);">🟡 進行中 <span style="font-size:9px;background:rgba(34,197,94,.25);color:var(--green);padding:1px 5px;border-radius:8px;margin-left:4px;">+2</span></span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:13%;background:#00b4d8;"></div></div><span class="funnel-count" style="color:var(--teal);">10</span></li>
         <li class="funnel-item"><span class="funnel-label">💬 商談後検討中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:7%;background:#00b4d8;"></div></div><span class="funnel-count" style="color:var(--teal);">6</span></li>
-        <li class="funnel-item"><span class="funnel-label" style="color:#a855f7;">🗓 初回商談確定 <span class="hot">+1</span></span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3%;background:#a855f7;"></div></div><span class="funnel-count" style="color:#a855f7;">2</span></li>
+        <li class="funnel-item"><span class="funnel-label" style="color:#a855f7;">🗓 初回商談確定</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2%;background:#a855f7;"></div></div><span class="funnel-count" style="color:#a855f7;">1</span></li>
         <li class="funnel-item"><span class="funnel-label">🧪 トライアル予定/調整中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:10%;background:#0096c7;"></div></div><span class="funnel-count" style="color:var(--teal);">9</span></li>
         <li class="funnel-item"><span class="funnel-label">⚗️ トライアル中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3%;background:#0096c7;"></div></div><span class="funnel-count" style="color:var(--teal);">2</span></li>
         <li class="funnel-item"><span class="funnel-label">📤 トライアル終了後_追客</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:5%;background:#0096c7;"></div></div><span class="funnel-count" style="color:var(--teal);">4</span></li>
         <li class="funnel-item"><span class="funnel-label">🔧 カスタマイズ商談</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3%;background:var(--gold);"></div></div><span class="funnel-count" style="color:var(--gold);">2</span></li>
+        <li class="funnel-item"><span class="funnel-label" style="color:#ec4899;">🏢 大型提案 <span style="font-size:9px;background:rgba(236,72,153,.2);color:#ec4899;padding:1px 5px;border-radius:8px;">OEM・組織横断</span></span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:0%;background:#ec4899;"></div></div><span class="funnel-count" style="color:#ec4899;">0</span></li>
         <li class="funnel-item"><span class="funnel-label">✅ 継続利用中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%;background:var(--green);"></div></div><span class="funnel-count" style="color:var(--green);">12</span></li>
         <li class="funnel-item"><span class="funnel-label">❌ 失注</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:48%;background:#ef4444;"></div></div><span class="funnel-count" style="color:#ef4444;">85</span></li>
         <li class="funnel-item"><span class="funnel-label">🚫 解約</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:7%;background:#dc2626;"></div></div><span class="funnel-count" style="color:#dc2626;">6</span></li>
@@ -284,7 +292,7 @@
     </div>
 
     <div class="chart-card">
-      <h3>チャネル別 件数（全422件）</h3>
+      <h3>チャネル別 件数（全423件）</h3>
       <div class="chart-wrap h300"><canvas id="channelChart"></canvas></div>
     </div>
   </div>
@@ -353,39 +361,32 @@
   </div>
 
   <!-- 最新ステータス変更 -->
-  <p class="section-title mb-20">📋 最新登録・ステータス変更案件（2026-06-08 更新分）</p>
+  <p class="section-title mb-20">📋 最新登録・ステータス変更案件（2026-06-15 更新分）</p>
   <div class="chart-card mb-20">
     <div style="overflow-x:auto;">
       <table class="data-table">
-        <thead><tr><th>会社名</th><th>ステータス</th><th>登録日</th><th>チャネル</th><th>メモ</th></tr></thead>
+        <thead><tr><th>会社名</th><th>変更前</th><th>変更後</th><th>登録日</th><th>メモ</th></tr></thead>
         <tbody>
-          <tr>
-            <td><strong>イオンペット株式会社</strong></td>
+          <tr class="hot-row">
+            <td><strong>🔥 イオンペット株式会社</strong></td>
             <td><span class="status-tag st-first">初回商談確定</span></td>
-            <td>2026-06-04</td>
-            <td>—</td>
-            <td style="color:var(--gold);">商談日:6/10 / 景表法・薬機法 / Standard想定 / 審査系部署</td>
+            <td><span class="status-tag st-active">進行中</span></td>
+            <td>6/10 商談実施</td>
+            <td style="color:var(--green);font-weight:700;">月800回・月額26〜29万見積中・次回6/18</td>
           </tr>
           <tr>
-            <td><strong>NTTアーバンバリューサポート㈱</strong></td>
+            <td><strong>ヘッドオフィスジャパン㈱</strong></td>
+            <td><span class="status-tag" style="background:rgba(148,163,184,.2);color:var(--text2);">アプローチ中</span></td>
+            <td><span class="status-tag st-active">進行中</span></td>
+            <td>2026-06-02</td>
+            <td style="color:var(--text2);">藤原様担当 / 2027年9月開始予定</td>
+          </tr>
+          <tr>
+            <td><strong>ポノテク株式会社</strong></td>
+            <td style="color:var(--text2);">（新規）</td>
             <td><span class="status-tag" style="background:rgba(148,163,184,.2);color:var(--text2);">アプローチ中</span></td>
             <td>2026-06-08</td>
-            <td>紹介</td>
-            <td style="color:var(--text2);">水口様担当</td>
-          </tr>
-          <tr>
-            <td><strong>名古屋大学医学部附属病院</strong></td>
-            <td><span class="status-tag" style="background:rgba(148,163,184,.2);color:var(--text2);">アプローチ中</span></td>
-            <td>2026-06-05</td>
-            <td>Web広告</td>
-            <td style="color:var(--text2);">須田様担当</td>
-          </tr>
-          <tr>
-            <td><strong>有限会社秋月製作所</strong></td>
-            <td><span class="status-tag" style="background:rgba(148,163,184,.2);color:var(--text2);">アプローチ中</span></td>
-            <td>2026-06-05</td>
-            <td>Web広告</td>
-            <td style="color:var(--text2);">秋月順様担当</td>
+            <td style="color:var(--text2);">LP_資料請求</td>
           </tr>
         </tbody>
       </table>
@@ -400,56 +401,48 @@ Chart.defaults.color = '#94a3b8';
 Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
 const TEAL='#00b4d8', GREEN='#22c55e', GOLD='#f4c842', RED='#ef4444', SLATE='#64748b';
 
-// 1. 契約プランドーナツ
 new Chart(document.getElementById('planChart'), {
   type:'doughnut',
   data:{ labels:['Enterprise','Standard','Starter','保守'], datasets:[{ data:[390000,385000,175000,30000], backgroundColor:[GOLD,TEAL,GREEN,SLATE], borderWidth:2, borderColor:'#1a2744' }] },
   options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ font:{size:11}, padding:10 } }, tooltip:{ callbacks:{ label:ctx=>`¥${ctx.parsed.toLocaleString()}/月` } } } }
 });
 
-// 2. チャネル横棒
 new Chart(document.getElementById('channelChart'), {
   type:'bar',
-  data:{ labels:['LP_資料請求','Web広告','セミナー','顧問','紹介','パートナー','営業代行','展示会'], datasets:[{ label:'件数', data:[128,103,60,24,17,13,11,5], backgroundColor:['rgba(0,180,216,.75)','rgba(34,197,94,.75)','rgba(244,200,66,.75)','rgba(168,85,247,.75)','rgba(249,115,22,.75)','rgba(236,72,153,.75)','rgba(100,116,139,.75)','rgba(6,182,212,.75)'], borderRadius:5, borderWidth:0 }] },
+  data:{ labels:['LP_資料請求','Web広告','セミナー','顧問','紹介','パートナー','営業代行','展示会'], datasets:[{ label:'件数', data:[129,103,60,24,17,13,11,5], backgroundColor:['rgba(0,180,216,.75)','rgba(34,197,94,.75)','rgba(244,200,66,.75)','rgba(168,85,247,.75)','rgba(249,115,22,.75)','rgba(236,72,153,.75)','rgba(100,116,139,.75)','rgba(6,182,212,.75)'], borderRadius:5, borderWidth:0 }] },
   options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ font:{size:11} } }, y:{ ticks:{ font:{size:11} } } } }
 });
 
-// 3. 導入確度
 new Chart(document.getElementById('confidenceChart'), {
   type:'doughnut',
-  data:{ labels:['D: 情報収集','C: 導入予定','B: 条件次第','A: 契約前提','契約/受注','未設定'], datasets:[{ data:[268,31,12,5,8,98], backgroundColor:[SLATE,'#0ea5e9','#3b82f6',GREEN,GOLD,'rgba(255,255,255,0.1)'], borderWidth:2, borderColor:'#1a2744' }] },
+  data:{ labels:['D: 情報収集','C: 導入予定','B: 条件次第','A: 契約前提','契約/受注','未設定'], datasets:[{ data:[268,31,12,5,8,99], backgroundColor:[SLATE,'#0ea5e9','#3b82f6',GREEN,GOLD,'rgba(255,255,255,0.1)'], borderWidth:2, borderColor:'#1a2744' }] },
   options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, padding:6 } } } }
 });
 
-// 4. 想定プラン
 new Chart(document.getElementById('planExpectedChart'), {
   type:'doughnut',
-  data:{ labels:['未定','Standard','Starter','Enterprise','Pro/customize'], datasets:[{ data:[323,18,18,10,7], backgroundColor:[SLATE,TEAL,GREEN,GOLD,'#a855f7'], borderWidth:2, borderColor:'#1a2744' }] },
+  data:{ labels:['未定','Standard','Starter','Enterprise','Pro/customize'], datasets:[{ data:[324,18,18,10,7], backgroundColor:[SLATE,TEAL,GREEN,GOLD,'#a855f7'], borderWidth:2, borderColor:'#1a2744' }] },
   options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, padding:6 } } } }
 });
 
-// 5. 商談先部署
 new Chart(document.getElementById('deptChart'), {
   type:'doughnut',
-  data:{ labels:['審査系部署','全体管理部署','制作系部署','経営層','無関係部署','未設定'], datasets:[{ data:[26,10,8,3,1,374], backgroundColor:[TEAL,GREEN,GOLD,'#a855f7',RED,'rgba(255,255,255,0.08)'], borderWidth:2, borderColor:'#1a2744' }] },
+  data:{ labels:['審査系部署','全体管理部署','制作系部署','経営層','無関係部署','未設定'], datasets:[{ data:[27,11,9,3,1,372], backgroundColor:[TEAL,GREEN,GOLD,'#a855f7',RED,'rgba(255,255,255,0.08)'], borderWidth:2, borderColor:'#1a2744' }] },
   options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, padding:6 } } } }
 });
 
-// 6. 対象法令
 new Chart(document.getElementById('lawChart'), {
   type:'bar',
-  data:{ labels:['景表法','薬機法','医療広告GL','宅建業法','食品表示法','健康増進法','保険業法'], datasets:[{ label:'件数', data:[106,80,20,9,8,8,5], backgroundColor:['rgba(0,180,216,.8)','rgba(34,197,94,.8)','rgba(244,200,66,.8)','rgba(168,85,247,.8)','rgba(249,115,22,.8)','rgba(6,182,212,.8)','rgba(236,72,153,.8)'], borderRadius:5, borderWidth:0 }] },
+  data:{ labels:['景表法','薬機法','医療広告GL','宅建業法','食品表示法','健康増進法','保険業法'], datasets:[{ label:'件数', data:[107,80,20,9,8,8,5], backgroundColor:['rgba(0,180,216,.8)','rgba(34,197,94,.8)','rgba(244,200,66,.8)','rgba(168,85,247,.8)','rgba(249,115,22,.8)','rgba(6,182,212,.8)','rgba(236,72,153,.8)'], borderRadius:5, borderWidth:0 }] },
   options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ font:{size:11} } }, y:{ ticks:{ font:{size:11} } } } }
 });
 
-// 7. 新機能後受注確度
 new Chart(document.getElementById('newFuncChart'), {
   type:'doughnut',
-  data:{ labels:['可能性:高','可能性:あり','不明','可能性なし'], datasets:[{ data:[13,12,30,2], backgroundColor:[RED,GOLD,SLATE,'#374151'], borderWidth:2, borderColor:'#1a2744' }] },
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:8 } }, tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ${ctx.parsed}件（入力済み57件中）` } } } }
+  data:{ labels:['可能性:高','可能性:あり','不明','可能性なし'], datasets:[{ data:[13,12,31,2], backgroundColor:[RED,GOLD,SLATE,'#374151'], borderWidth:2, borderColor:'#1a2744' }] },
+  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:8 } }, tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ${ctx.parsed}件（入力済み58件中）` } } } }
 });
 
-// 8. パートナー
 new Chart(document.getElementById('partnerChart'), {
   type:'bar',
   data:{ labels:['DGBT','SGS','後藤さん','狩野さん','森本さん','各務さん','松崎さん','Acrove'], datasets:[{ label:'件数', data:[4,2,1,1,1,1,1,1], backgroundColor:'rgba(0,180,216,0.75)', borderRadius:5, borderWidth:0 }] },
