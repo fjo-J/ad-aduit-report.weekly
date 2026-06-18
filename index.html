@@ -3,263 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>広告チェックAI 案件管理ダッシュボード 2026-06-15</title>
+<title>広告チェックAI 案件管理ダッシュボード 2026-06-18</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg:#0d1b2e; --card:#1a2744;
-    --teal:#00b4d8; --green:#22c55e; --gold:#f4c842; --red:#ef4444;
-    --text:#e2e8f0; --text2:#94a3b8; --border:rgba(0,180,216,0.18);
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0d1b2e;--card:#1a2744;
+    --teal:#00b4d8;--green:#22c55e;--gold:#f4c842;--red:#ef4444;--pink:#ec4899;
+    --text:#e2e8f0;--text2:#94a3b8;--border:rgba(0,180,216,.18);
   }
-  body { background:var(--bg); color:var(--text); font-family:Arial,'Arial Black','Hiragino Kaku Gothic ProN',Meiryo,sans-serif; padding:0 0 48px; }
+  body{background:var(--bg);color:var(--text);font-family:Arial,'Arial Black','Hiragino Kaku Gothic ProN',Meiryo,sans-serif;padding:0 0 48px}
 
-  /* HEADER */
-  .header { background:linear-gradient(135deg,#0d2040,#0a3060); border-bottom:2px solid var(--teal); padding:22px 32px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
-  .header-left h1 { font-family:'Arial Black',Arial,sans-serif; font-size:clamp(15px,2.6vw,25px); color:var(--teal); line-height:1.2; }
-  .header-left p { font-size:12px; color:var(--text2); margin-top:4px; }
-  .header-right { display:flex; gap:9px; flex-wrap:wrap; align-items:center; }
-  .badge { background:var(--teal); color:#fff; font-weight:700; font-size:12px; padding:5px 13px; border-radius:20px; white-space:nowrap; }
-  .badge-gold  { background:var(--gold); color:#1a1a1a; }
-  .badge-green { background:var(--green); color:#fff; }
+  .header{background:linear-gradient(135deg,#0d2040,#0a3060);border-bottom:2px solid var(--teal);padding:22px 32px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  .header-left h1{font-family:'Arial Black',Arial,sans-serif;font-size:clamp(15px,2.6vw,25px);color:var(--teal);line-height:1.2}
+  .header-left p{font-size:12px;color:var(--text2);margin-top:4px}
+  .header-right{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+  .badge{background:var(--teal);color:#fff;font-weight:700;font-size:12px;padding:5px 13px;border-radius:20px;white-space:nowrap}
+  .badge-gold{background:var(--gold);color:#1a1a1a}
+  .badge-green{background:var(--green);color:#fff}
+  .badge-pink{background:var(--pink);color:#fff}
 
-  /* DIFF BANNER */
-  .diff-banner { background:rgba(0,180,216,0.08); border-left:4px solid var(--teal); margin:16px 20px 0; border-radius:0 8px 8px 0; padding:10px 16px; font-size:12px; display:flex; flex-wrap:wrap; gap:14px; }
-  .diff-item { display:flex; align-items:center; gap:5px; }
+  .diff-banner{background:rgba(0,180,216,.08);border-left:4px solid var(--teal);margin:16px 20px 0;border-radius:0 8px 8px 0;padding:10px 16px;font-size:12px;display:flex;flex-wrap:wrap;gap:14px}
+  .diff-item{display:flex;align-items:center;gap:5px}
+  .hot-banner{background:rgba(34,197,94,.1);border-left:4px solid var(--green);margin:8px 20px 0;border-radius:0 8px 8px 0;padding:10px 16px;font-size:12px}
+  .hot-banner strong{color:var(--green)}
+  .oem-banner{background:rgba(236,72,153,.08);border-left:4px solid var(--pink);margin:8px 20px 0;border-radius:0 8px 8px 0;padding:10px 16px;font-size:12px}
+  .oem-banner strong{color:var(--pink)}
 
-  /* HOT BANNER (高優先) */
-  .hot-banner { background:rgba(34,197,94,0.1); border-left:4px solid var(--green); margin:10px 20px 0; border-radius:0 8px 8px 0; padding:10px 16px; font-size:12px; }
-  .hot-banner strong { color:var(--green); }
+  .container{max-width:1400px;margin:0 auto;padding:18px 20px 0}
+  .section-title{font-family:'Arial Black',Arial,sans-serif;font-size:13px;color:var(--teal);letter-spacing:1px;text-transform:uppercase;margin-bottom:13px;padding-bottom:5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+  .section-title::before{content:'';display:inline-block;width:4px;height:14px;background:var(--teal);border-radius:2px}
+  .mb-20{margin-bottom:20px}
 
-  /* LAYOUT */
-  .container { max-width:1400px; margin:0 auto; padding:18px 20px 0; }
-  .section-title { font-family:'Arial Black',Arial,sans-serif; font-size:13px; color:var(--teal); letter-spacing:1px; text-transform:uppercase; margin-bottom:13px; padding-bottom:5px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:7px; }
-  .section-title::before { content:''; display:inline-block; width:4px; height:14px; background:var(--teal); border-radius:2px; }
-  .mb-20 { margin-bottom:20px; }
+  .kpi-row{display:grid;gap:12px;margin-bottom:20px}
+  .kpi-row-6{grid-template-columns:repeat(6,1fr)}
+  .kpi-row-4{grid-template-columns:repeat(4,1fr)}
+  .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px 14px 12px;position:relative;overflow:hidden}
+  .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--teal)}
+  .kpi-card.green::before{background:var(--green)}
+  .kpi-card.gold::before{background:var(--gold)}
+  .kpi-card.red::before{background:var(--red)}
+  .kpi-card.pink::before{background:var(--pink)}
+  .kpi-label{font-size:10px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+  .kpi-value{font-family:'Arial Black',Arial,sans-serif;font-size:clamp(19px,2.1vw,28px);color:var(--teal);line-height:1}
+  .kpi-card.green .kpi-value{color:var(--green)}
+  .kpi-card.gold .kpi-value{color:var(--gold)}
+  .kpi-card.red .kpi-value{color:var(--red)}
+  .kpi-card.pink .kpi-value{color:var(--pink)}
+  .kpi-sub{font-size:10px;color:var(--text2);margin-top:4px}
 
-  /* KPI */
-  .kpi-row { display:grid; gap:12px; margin-bottom:20px; }
-  .kpi-row-6 { grid-template-columns:repeat(6,1fr); }
-  .kpi-row-4 { grid-template-columns:repeat(4,1fr); }
-  .kpi-card { background:var(--card); border:1px solid var(--border); border-radius:11px; padding:16px 14px 12px; position:relative; overflow:hidden; }
-  .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--teal); }
-  .kpi-card.green::before { background:var(--green); }
-  .kpi-card.gold::before  { background:var(--gold); }
-  .kpi-card.red::before   { background:var(--red); }
-  .kpi-label { font-size:10px; color:var(--text2); letter-spacing:.5px; text-transform:uppercase; margin-bottom:6px; }
-  .kpi-value { font-family:'Arial Black',Arial,sans-serif; font-size:clamp(19px,2.1vw,28px); color:var(--teal); line-height:1; }
-  .kpi-card.green .kpi-value { color:var(--green); }
-  .kpi-card.gold  .kpi-value { color:var(--gold); }
-  .kpi-card.red   .kpi-value { color:var(--red); }
-  .kpi-sub { font-size:10px; color:var(--text2); margin-top:4px; }
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+  .chart-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px}
+  .chart-card h3{font-size:12px;color:var(--teal);margin-bottom:11px;font-family:'Arial Black',Arial,sans-serif}
+  .chart-wrap{position:relative;width:100%}
+  .chart-wrap.h220{height:220px}.chart-wrap.h260{height:260px}
+  .chart-wrap.h300{height:300px}.chart-wrap.h180{height:180px}.chart-wrap.h160{height:160px}
 
-  /* GRIDS */
-  .two-col   { display:grid; grid-template-columns:1fr 1fr;     gap:16px; margin-bottom:20px; }
-  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px; }
+  .data-table{width:100%;border-collapse:collapse;font-size:12px}
+  .data-table thead th{background:rgba(0,180,216,.12);color:var(--teal);padding:6px 8px;text-align:left;font-size:11px;white-space:nowrap}
+  .data-table tbody tr{border-bottom:1px solid rgba(255,255,255,.05)}
+  .data-table tbody tr:hover{background:rgba(0,180,216,.06)}
+  .data-table tbody td{padding:6px 8px;color:var(--text)}
 
-  /* CARDS */
-  .chart-card { background:var(--card); border:1px solid var(--border); border-radius:11px; padding:16px; }
-  .chart-card h3 { font-size:12px; color:var(--teal); margin-bottom:11px; font-family:'Arial Black',Arial,sans-serif; }
-  .chart-wrap { position:relative; width:100%; }
-  .chart-wrap.h220 { height:220px; }
-  .chart-wrap.h260 { height:260px; }
-  .chart-wrap.h300 { height:300px; }
-  .chart-wrap.h180 { height:180px; }
-  .chart-wrap.h160 { height:160px; }
+  .plan-tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700}
+  .plan-e{background:rgba(244,200,66,.2);color:var(--gold)}
+  .plan-s{background:rgba(0,180,216,.2);color:var(--teal)}
+  .plan-st{background:rgba(34,197,94,.2);color:var(--green)}
+  .plan-m{background:rgba(148,163,184,.2);color:var(--text2)}
+  .status-tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700}
+  .st-active{background:rgba(34,197,94,.2);color:var(--green)}
+  .st-trial{background:rgba(0,180,216,.2);color:var(--teal)}
+  .st-custom{background:rgba(244,200,66,.2);color:var(--gold)}
+  .st-follow{background:rgba(148,163,184,.2);color:var(--text2)}
+  .st-first{background:rgba(168,85,247,.2);color:#a855f7}
+  .st-oem{background:rgba(236,72,153,.2);color:var(--pink)}
+  .conf-high{color:#f87171;font-weight:700}
 
-  /* TABLE */
-  .data-table { width:100%; border-collapse:collapse; font-size:12px; }
-  .data-table thead th { background:rgba(0,180,216,.12); color:var(--teal); padding:6px 8px; text-align:left; font-size:11px; white-space:nowrap; }
-  .data-table tbody tr { border-bottom:1px solid rgba(255,255,255,.05); }
-  .data-table tbody tr:hover { background:rgba(0,180,216,.06); }
-  .data-table tbody td { padding:6px 8px; color:var(--text); }
+  .funnel-list{list-style:none}
+  .funnel-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px}
+  .funnel-item:last-child{border-bottom:none}
+  .funnel-label{flex:1;color:var(--text2);font-size:11px}
+  .funnel-bar-wrap{width:110px;height:7px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+  .funnel-bar{height:100%;border-radius:4px}
+  .funnel-count{width:30px;text-align:right;font-weight:700;font-size:12px}
 
-  /* TAGS */
-  .plan-tag { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; font-weight:700; }
-  .plan-e  { background:rgba(244,200,66,.2); color:var(--gold); }
-  .plan-s  { background:rgba(0,180,216,.2);  color:var(--teal); }
-  .plan-st { background:rgba(34,197,94,.2);  color:var(--green); }
-  .plan-m  { background:rgba(148,163,184,.2); color:var(--text2); }
-  .status-tag { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; font-weight:700; }
-  .st-active { background:rgba(34,197,94,.2);  color:var(--green); }
-  .st-trial  { background:rgba(0,180,216,.2);   color:var(--teal); }
-  .st-custom { background:rgba(244,200,66,.2);  color:var(--gold); }
-  .st-follow { background:rgba(148,163,184,.2); color:var(--text2); }
-  .st-first  { background:rgba(168,85,247,.2);  color:#a855f7; }
-  .conf-high { color:#f87171; font-weight:700; }
+  .plan-breakdown{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  .plan-row{display:flex;align-items:center;gap:9px}
+  .plan-name{width:85px;font-size:11px;color:var(--text2)}
+  .plan-bar-wrap2{flex:1;height:19px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+  .plan-bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:7px;font-size:10px;font-weight:700}
+  .plan-meta{width:100px;text-align:right;font-size:10px;color:var(--text2)}
 
-  /* FUNNEL */
-  .funnel-list { list-style:none; }
-  .funnel-item { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:11px; }
-  .funnel-item:last-child { border-bottom:none; }
-  .funnel-label { flex:1; color:var(--text2); font-size:11px; }
-  .funnel-bar-wrap { width:110px; height:7px; background:rgba(255,255,255,.08); border-radius:4px; overflow:hidden; }
-  .funnel-bar { height:100%; border-radius:4px; }
-  .funnel-count { width:30px; text-align:right; font-weight:700; font-size:12px; }
+  .pill-grid{display:flex;flex-wrap:wrap;gap:6px}
+  .pill{background:rgba(0,180,216,.1);border:1px solid rgba(0,180,216,.25);color:var(--teal);padding:3px 9px;border-radius:20px;font-size:11px;display:flex;align-items:center;gap:5px}
+  .pill-count{background:var(--teal);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px}
+  .note{background:rgba(244,200,66,.08);border:1px solid rgba(244,200,66,.3);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--gold);margin-top:9px;display:flex;align-items:flex-start;gap:6px}
+  .note::before{content:'ℹ️';font-size:12px}
+  .hot-row{background:rgba(34,197,94,.07)!important}
+  .oem-row{background:rgba(236,72,153,.07)!important}
 
-  /* PLAN BARS */
-  .plan-breakdown { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
-  .plan-row { display:flex; align-items:center; gap:9px; }
-  .plan-name { width:85px; font-size:11px; color:var(--text2); }
-  .plan-bar-wrap2 { flex:1; height:19px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; }
-  .plan-bar-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:7px; font-size:10px; font-weight:700; }
-  .plan-meta { width:100px; text-align:right; font-size:10px; color:var(--text2); }
-
-  /* PILLS */
-  .pill-grid { display:flex; flex-wrap:wrap; gap:6px; }
-  .pill { background:rgba(0,180,216,.1); border:1px solid rgba(0,180,216,.25); color:var(--teal); padding:3px 9px; border-radius:20px; font-size:11px; display:flex; align-items:center; gap:5px; }
-  .pill-count { background:var(--teal); color:#fff; font-size:9px; font-weight:700; padding:1px 5px; border-radius:10px; }
-
-  /* NOTE */
-  .note { background:rgba(244,200,66,.08); border:1px solid rgba(244,200,66,.3); border-radius:8px; padding:8px 12px; font-size:11px; color:var(--gold); margin-top:9px; display:flex; align-items:flex-start; gap:6px; }
-  .note::before { content:'ℹ️'; font-size:12px; }
-
-  /* HOT ROW */
-  .hot-row { background:rgba(34,197,94,.07) !important; }
-
-  /* RESPONSIVE */
-  @media (max-width:1100px) { .kpi-row-6{grid-template-columns:repeat(3,1fr)} .kpi-row-4{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:768px)  { .kpi-row-6{grid-template-columns:repeat(2,1fr)} .two-col,.three-col{grid-template-columns:1fr} .header{padding:15px} .container{padding:12px 12px 0} }
+  @media(max-width:1100px){.kpi-row-6{grid-template-columns:repeat(3,1fr)}.kpi-row-4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:768px){.kpi-row-6{grid-template-columns:repeat(2,1fr)}.two-col,.three-col{grid-template-columns:1fr}.header{padding:15px}.container{padding:12px 12px 0}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-left">
     <h1>📊 広告チェックAI 案件管理ダッシュボード</h1>
-    <p>データ取得日時：2026年6月15日（月）&nbsp;|&nbsp;Notion DB 全件同期済み（6ページ完了）</p>
+    <p>データ取得日時：2026年6月18日（木）&nbsp;|&nbsp;Notion DB 全件同期済み（6ページ完了）</p>
   </div>
   <div class="header-right">
-    <span class="badge badge-gold">総件数 423件</span>
+    <span class="badge badge-gold">総件数 426件</span>
     <span class="badge badge-green">継続利用中 12社</span>
-    <span class="badge">前回比 変更なし</span>
+    <span class="badge badge-pink">大型提案 1件 NEW</span>
+    <span class="badge">前回比 +3件</span>
   </div>
 </div>
 
-<!-- DIFF BANNER -->
-<div class="diff-banner" style="border-left-color:#64748b;background:rgba(100,116,139,0.08);">
-  <div class="diff-item" style="color:var(--text2);">📋 前回（6/11）比：<strong style="color:var(--text);">新規登録・ステータス変更なし</strong>　データは前回と同一です</div>
-  <div class="diff-item" style="color:var(--text2);">🎯 注目案件：<strong>イオンペット㈱</strong> 次回アクション 6/18（見積提出）</div>
+<div class="diff-banner">
+  <div class="diff-item">🆕 <strong>株式会社ゆうちょ銀行</strong> 新規（初回商談確定 / 金融 / 金商法・景表法 / 6/17）</div>
+  <div class="diff-item">🆕 <strong>天藤製薬株式会社</strong> 新規（初回商談確定 / 医薬品 / 初回商談6/23）</div>
+  <div class="diff-item">🆕 <strong>株式会社Brushup</strong> 新規（アプローチ中 / 6/16）</div>
+  <div class="diff-item">🏢 <strong style="color:var(--pink);">アシックスジャパン㈱</strong> カスタマイズ商談 → <span class="st-oem" style="padding:1px 7px;border-radius:8px;">大型提案</span></div>
+  <div class="diff-item">🎉 <strong>アリミノ</strong> 初回商談確定 → トライアル予定（6/16商談実施！Standard・2026年9月導入予定）</div>
+  <div class="diff-item">✅ <strong>イオンペット㈱</strong> 進行中 → トライアル予定（6/18後）</div>
+  <div class="diff-item">📤 <strong>Tver</strong> トライアル中 → トライアル終了後_追客中</div>
+</div>
+<div class="oem-banner">
+  🏢 <strong>大型提案 初登場：アシックスジャパン㈱</strong>（OEM提供・組織横断型）　スポーツ公正競争規約対応・カスタムプロンプト開発中。受注時のARRインパクト大。
+</div>
+<div class="hot-banner" style="margin-bottom:0">
+  🎉 <strong>アリミノ：6/16 初回商談実施</strong>　Standard想定 / 2026年9月導入予定（期のタイミングに合わせ）。次ステップはトライアル設定。
 </div>
 
-<!-- HOT BANNER -->
-<div class="hot-banner">
-  🔥 <strong>イオンペット㈱ 今週の山場</strong>：6/18（木）に見積提出予定。月800回チェック・月額26〜29万円の大型案件。受注すればMRR +26万〜、ARR +312万円超。
-</div>
-
-<!-- MAIN -->
 <div class="container">
 
-  <!-- 売上KPI -->
   <p class="section-title mb-20">売上 KPI</p>
   <div class="kpi-row kpi-row-6 mb-20">
-    <div class="kpi-card green">
-      <div class="kpi-label">現在 MRR</div>
-      <div class="kpi-value">¥980,000</div>
-      <div class="kpi-sub">契約月額合計（12社全員入力済み）</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-label">ARR（年間換算）</div>
-      <div class="kpi-value">¥11.76M</div>
-      <div class="kpi-sub">MRR × 12</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">契約済み社数</div>
-      <div class="kpi-value">12社</div>
-      <div class="kpi-sub">継続利用中（変動なし）</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">平均契約単価</div>
-      <div class="kpi-value">¥81,667</div>
-      <div class="kpi-sub">契約月額 ÷ 12社</div>
-    </div>
-    <div class="kpi-card gold">
-      <div class="kpi-label">商談勝率</div>
-      <div class="kpi-value">12.4%</div>
-      <div class="kpi-sub">継続12 ÷ (12+失注85)</div>
-    </div>
-    <div class="kpi-card gold">
-      <div class="kpi-label">パイプライン想定売上</div>
-      <div class="kpi-value">¥0</div>
-      <div class="kpi-sub">年間想定予算 入力案件なし</div>
-    </div>
+    <div class="kpi-card green"><div class="kpi-label">現在 MRR</div><div class="kpi-value">¥980,000</div><div class="kpi-sub">契約月額合計（12社全員入力済み）</div></div>
+    <div class="kpi-card green"><div class="kpi-label">ARR（年間換算）</div><div class="kpi-value">¥11.76M</div><div class="kpi-sub">MRR × 12</div></div>
+    <div class="kpi-card"><div class="kpi-label">契約済み社数</div><div class="kpi-value">12社</div><div class="kpi-sub">継続利用中（変動なし）</div></div>
+    <div class="kpi-card"><div class="kpi-label">平均契約単価</div><div class="kpi-value">¥81,667</div><div class="kpi-sub">契約月額 ÷ 12社</div></div>
+    <div class="kpi-card gold"><div class="kpi-label">商談勝率</div><div class="kpi-value">12.4%</div><div class="kpi-sub">継続12 ÷ (12+失注85)</div></div>
+    <div class="kpi-card gold"><div class="kpi-label">パイプライン想定売上</div><div class="kpi-value">¥0</div><div class="kpi-sub">年間想定予算 入力案件なし</div></div>
   </div>
 
-  <!-- 商談KPI -->
   <p class="section-title mb-20">商談 KPI</p>
   <div class="kpi-row kpi-row-4 mb-20">
-    <div class="kpi-card">
-      <div class="kpi-label">総登録件数</div>
-      <div class="kpi-value">423件</div>
-      <div class="kpi-sub">前回(6/11)比 変更なし</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-label">アクティブ商談数</div>
-      <div class="kpi-value">34件</div>
-      <div class="kpi-sub">イオンペット・ヘッドオフィス 進行中+2</div>
-    </div>
-    <div class="kpi-card red">
-      <div class="kpi-label">失注累計</div>
-      <div class="kpi-value">85件</div>
-      <div class="kpi-sub">変動なし</div>
-    </div>
-    <div class="kpi-card red">
-      <div class="kpi-label">解約数</div>
-      <div class="kpi-value">6件</div>
-      <div class="kpi-sub">変動なし</div>
-    </div>
+    <div class="kpi-card"><div class="kpi-label">総登録件数</div><div class="kpi-value">426件</div><div class="kpi-sub">前回(6/15)比 +3件</div></div>
+    <div class="kpi-card green"><div class="kpi-label">アクティブ商談数</div><div class="kpi-value">36件</div><div class="kpi-sub">大型提案・新規初回商談確定 含む</div></div>
+    <div class="kpi-card red"><div class="kpi-label">失注累計</div><div class="kpi-value">85件</div><div class="kpi-sub">変動なし</div></div>
+    <div class="kpi-card red"><div class="kpi-label">解約数</div><div class="kpi-value">6件</div><div class="kpi-sub">変動なし</div></div>
   </div>
 
-  <!-- 売上内訳 -->
   <p class="section-title mb-20">売上内訳</p>
   <div class="two-col mb-20">
-
     <div class="chart-card">
       <h3>契約プラン別 社数・月額内訳（継続利用中 12社）</h3>
       <div class="plan-breakdown">
-        <div class="plan-row">
-          <div class="plan-name"><span class="plan-tag plan-e">Enterprise</span></div>
-          <div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:97%;background:linear-gradient(90deg,#f4c842,#d4a017);color:#1a1a1a;">¥390,000</div></div>
-          <div class="plan-meta">2社 / avg ¥195,000</div>
-        </div>
-        <div class="plan-row">
-          <div class="plan-name"><span class="plan-tag plan-s">Standard</span></div>
-          <div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:98%;background:linear-gradient(90deg,#00b4d8,#0096c7);color:#fff;">¥385,000</div></div>
-          <div class="plan-meta">4社 / avg ¥96,250</div>
-        </div>
-        <div class="plan-row">
-          <div class="plan-name"><span class="plan-tag plan-st">Starter</span></div>
-          <div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:45%;background:linear-gradient(90deg,#22c55e,#16a34a);color:#fff;">¥175,000</div></div>
-          <div class="plan-meta">5社 / avg ¥35,000</div>
-        </div>
-        <div class="plan-row">
-          <div class="plan-name"><span class="plan-tag plan-m">保守</span></div>
-          <div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:8%;background:rgba(148,163,184,.4);color:#e2e8f0;">¥30K</div></div>
-          <div class="plan-meta">1社 / ¥30,000</div>
-        </div>
+        <div class="plan-row"><div class="plan-name"><span class="plan-tag plan-e">Enterprise</span></div><div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:97%;background:linear-gradient(90deg,#f4c842,#d4a017);color:#1a1a1a;">¥390,000</div></div><div class="plan-meta">2社 / avg ¥195,000</div></div>
+        <div class="plan-row"><div class="plan-name"><span class="plan-tag plan-s">Standard</span></div><div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:98%;background:linear-gradient(90deg,#00b4d8,#0096c7);color:#fff;">¥385,000</div></div><div class="plan-meta">4社 / avg ¥96,250</div></div>
+        <div class="plan-row"><div class="plan-name"><span class="plan-tag plan-st">Starter</span></div><div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:45%;background:linear-gradient(90deg,#22c55e,#16a34a);color:#fff;">¥175,000</div></div><div class="plan-meta">5社 / avg ¥35,000</div></div>
+        <div class="plan-row"><div class="plan-name"><span class="plan-tag plan-m">保守</span></div><div class="plan-bar-wrap2"><div class="plan-bar-fill" style="width:8%;background:rgba(148,163,184,.4);color:#e2e8f0;">¥30K</div></div><div class="plan-meta">1社 / ¥30,000</div></div>
       </div>
       <div class="chart-wrap h180"><canvas id="planChart"></canvas></div>
     </div>
-
     <div class="chart-card">
       <h3>継続利用中 12社 一覧</h3>
-      <div style="overflow-x:auto;">
+      <div style="overflow-x:auto">
         <table class="data-table">
           <thead><tr><th>会社名</th><th>契約プラン</th><th>契約月額</th><th>継続月数</th><th>備考</th></tr></thead>
           <tbody>
-            <tr><td>株式会社伊勢半</td><td><span class="plan-tag plan-e">Enterprise</span></td><td style="color:var(--gold);font-weight:700;">¥240,000</td><td><span style="color:var(--text2);">3ヶ月</span><br><span style="font-size:9px;color:#64748b;">2026-03-01〜</span></td><td style="color:var(--text2);">パートナー経由</td></tr>
-            <tr><td>全国生活協同組合連合会</td><td><span class="plan-tag plan-e">Enterprise</span></td><td style="color:var(--gold);font-weight:700;">¥150,000</td><td><span style="color:var(--teal);font-weight:700;">10ヶ月</span><br><span style="font-size:9px;color:#64748b;">2025-08-01〜</span></td><td></td></tr>
-            <tr><td>リンクシェア・ジャパン㈱</td><td><span class="plan-tag plan-s">Standard</span></td><td style="color:var(--teal);font-weight:700;">¥145,000</td><td><span style="color:var(--green);font-weight:700;">13ヶ月</span><br><span style="font-size:9px;color:#64748b;">2025-05-07〜</span></td><td></td></tr>
-            <tr><td>バブルスター株式会社</td><td><span class="plan-tag plan-s">Standard</span></td><td style="color:var(--teal);font-weight:700;">¥95,000</td><td><span style="color:var(--text2);">4ヶ月</span><br><span style="font-size:9px;color:#64748b;">2026-02-01〜</span></td><td></td></tr>
-            <tr><td>ソフトバンク株式会社</td><td><span class="plan-tag plan-s">Standard</span></td><td style="color:var(--teal);font-weight:700;">¥95,000</td><td><span style="color:var(--text2);">2ヶ月</span><br><span style="font-size:9px;color:#64748b;">2026-04-01〜</span></td><td></td></tr>
-            <tr><td>株式会社シーボン</td><td><span class="plan-tag plan-s">Standard</span></td><td style="color:var(--teal);font-weight:700;">¥50,000</td><td><span style="color:var(--text2);">1ヶ月</span><br><span style="font-size:9px;color:#64748b;">2026-05-01〜</span></td><td></td></tr>
-            <tr><td>株式会社東京ディベロ</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700;">¥35,000</td><td><span style="color:var(--teal);font-weight:700;">10ヶ月</span><br><span style="font-size:9px;color:#64748b;">2025-08-22〜</span></td><td></td></tr>
-            <tr><td>株式会社COSPAウエルネス</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700;">¥35,000</td><td><span style="color:var(--text2);">1ヶ月</span><br><span style="font-size:9px;color:#64748b;">2026-05-01〜</span></td><td></td></tr>
-            <tr><td>武内製薬株式会社</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700;">¥35,000</td><td><span style="color:var(--green);font-weight:700;">16ヶ月</span><br><span style="font-size:9px;color:#64748b;">2025-01-31〜</span></td><td style="color:var(--gold);">手数料10%</td></tr>
-            <tr><td>ZOOST株式会社</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700;">¥35,000</td><td><span style="color:var(--teal);">7ヶ月</span><br><span style="font-size:9px;color:#64748b;">2025-11-01〜</span></td><td></td></tr>
-            <tr><td>株式会社PIGNUS</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700;">¥35,000</td><td><span style="color:var(--teal);font-weight:700;">11ヶ月</span><br><span style="font-size:9px;color:#64748b;">2025-07-01〜</span></td><td></td></tr>
-            <tr><td>ナビプラス株式会社</td><td><span class="plan-tag plan-m">保守</span></td><td style="color:var(--text2);font-weight:700;">¥30,000</td><td><span style="color:var(--teal);">8ヶ月</span><br><span style="font-size:9px;color:#64748b;">2025-10-01〜</span></td><td></td></tr>
+            <tr><td>株式会社伊勢半</td><td><span class="plan-tag plan-e">Enterprise</span></td><td style="color:var(--gold);font-weight:700">¥240,000</td><td><span style="color:var(--text2)">3ヶ月</span><br><span style="font-size:9px;color:#64748b">2026-03-01〜</span></td><td style="color:var(--text2)">パートナー経由</td></tr>
+            <tr><td>全国生活協同組合連合会</td><td><span class="plan-tag plan-e">Enterprise</span></td><td style="color:var(--gold);font-weight:700">¥150,000</td><td><span style="color:var(--teal);font-weight:700">10ヶ月</span><br><span style="font-size:9px;color:#64748b">2025-08-01〜</span></td><td></td></tr>
+            <tr><td>リンクシェア・ジャパン㈱</td><td><span class="plan-tag plan-s">Standard</span></td><td style="color:var(--teal);font-weight:700">¥145,000</td><td><span style="color:var(--green);font-weight:700">13ヶ月</span><br><span style="font-size:9px;color:#64748b">2025-05-07〜</span></td><td></td></tr>
+            <tr><td>バブルスター株式会社</td><td><span class="plan-tag plan-s">Standard</span></td><td style="color:var(--teal);font-weight:700">¥95,000</td><td><span style="color:var(--text2)">4ヶ月</span><br><span style="font-size:9px;color:#64748b">2026-02-01〜</span></td><td></td></tr>
+            <tr><td>ソフトバンク株式会社</td><td><span class="plan-tag plan-s">Standard</span></td><td style="color:var(--teal);font-weight:700">¥95,000</td><td><span style="color:var(--text2)">2ヶ月</span><br><span style="font-size:9px;color:#64748b">2026-04-01〜</span></td><td></td></tr>
+            <tr><td>株式会社シーボン</td><td><span class="plan-tag plan-s">Standard</span></td><td style="color:var(--teal);font-weight:700">¥50,000</td><td><span style="color:var(--text2)">1ヶ月</span><br><span style="font-size:9px;color:#64748b">2026-05-01〜</span></td><td></td></tr>
+            <tr><td>株式会社東京ディベロ</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700">¥35,000</td><td><span style="color:var(--teal);font-weight:700">10ヶ月</span><br><span style="font-size:9px;color:#64748b">2025-08-22〜</span></td><td></td></tr>
+            <tr><td>株式会社COSPAウエルネス</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700">¥35,000</td><td><span style="color:var(--text2)">1ヶ月</span><br><span style="font-size:9px;color:#64748b">2026-05-01〜</span></td><td></td></tr>
+            <tr><td>武内製薬株式会社</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700">¥35,000</td><td><span style="color:var(--green);font-weight:700">16ヶ月</span><br><span style="font-size:9px;color:#64748b">2025-01-31〜</span></td><td style="color:var(--gold)">手数料10%</td></tr>
+            <tr><td>ZOOST株式会社</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700">¥35,000</td><td><span style="color:var(--teal)">7ヶ月</span><br><span style="font-size:9px;color:#64748b">2025-11-01〜</span></td><td></td></tr>
+            <tr><td>株式会社PIGNUS</td><td><span class="plan-tag plan-st">Starter</span></td><td style="color:var(--green);font-weight:700">¥35,000</td><td><span style="color:var(--teal);font-weight:700">11ヶ月</span><br><span style="font-size:9px;color:#64748b">2025-07-01〜</span></td><td></td></tr>
+            <tr><td>ナビプラス株式会社</td><td><span class="plan-tag plan-m">保守</span></td><td style="color:var(--text2);font-weight:700">¥30,000</td><td><span style="color:var(--teal)">8ヶ月</span><br><span style="font-size:9px;color:#64748b">2025-10-01〜</span></td><td></td></tr>
           </tbody>
         </table>
       </div>
@@ -267,37 +195,33 @@
     </div>
   </div>
 
-  <!-- ステータス + チャネル -->
   <p class="section-title mb-20">ステータスファネル ／ チャネル分析</p>
   <div class="two-col mb-20">
-
     <div class="chart-card">
-      <h3>ステータスファネル（全423件）</h3>
+      <h3>ステータスファネル（全426件）</h3>
       <ul class="funnel-list">
-        <li class="funnel-item"><span class="funnel-label">🔵 アプローチ中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:52%;background:#334155;"></div></div><span class="funnel-count" style="color:var(--text2);">96</span></li>
-        <li class="funnel-item"><span class="funnel-label">🌀 長期フォロー</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#2a3f5f;"></div></div><span class="funnel-count" style="color:var(--text2);">180</span></li>
-        <li class="funnel-item"><span class="funnel-label" style="color:var(--teal);">🟡 進行中 <span style="font-size:9px;background:rgba(34,197,94,.25);color:var(--green);padding:1px 5px;border-radius:8px;margin-left:4px;">+2</span></span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:13%;background:#00b4d8;"></div></div><span class="funnel-count" style="color:var(--teal);">10</span></li>
-        <li class="funnel-item"><span class="funnel-label">💬 商談後検討中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:7%;background:#00b4d8;"></div></div><span class="funnel-count" style="color:var(--teal);">6</span></li>
-        <li class="funnel-item"><span class="funnel-label" style="color:#a855f7;">🗓 初回商談確定</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2%;background:#a855f7;"></div></div><span class="funnel-count" style="color:#a855f7;">1</span></li>
-        <li class="funnel-item"><span class="funnel-label">🧪 トライアル予定/調整中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:10%;background:#0096c7;"></div></div><span class="funnel-count" style="color:var(--teal);">9</span></li>
-        <li class="funnel-item"><span class="funnel-label">⚗️ トライアル中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3%;background:#0096c7;"></div></div><span class="funnel-count" style="color:var(--teal);">2</span></li>
-        <li class="funnel-item"><span class="funnel-label">📤 トライアル終了後_追客</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:5%;background:#0096c7;"></div></div><span class="funnel-count" style="color:var(--teal);">4</span></li>
-        <li class="funnel-item"><span class="funnel-label">🔧 カスタマイズ商談</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3%;background:var(--gold);"></div></div><span class="funnel-count" style="color:var(--gold);">2</span></li>
-        <li class="funnel-item"><span class="funnel-label" style="color:#ec4899;">🏢 大型提案 <span style="font-size:9px;background:rgba(236,72,153,.2);color:#ec4899;padding:1px 5px;border-radius:8px;">OEM・組織横断</span></span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:0%;background:#ec4899;"></div></div><span class="funnel-count" style="color:#ec4899;">0</span></li>
-        <li class="funnel-item"><span class="funnel-label">✅ 継続利用中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%;background:var(--green);"></div></div><span class="funnel-count" style="color:var(--green);">12</span></li>
-        <li class="funnel-item"><span class="funnel-label">❌ 失注</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:48%;background:#ef4444;"></div></div><span class="funnel-count" style="color:#ef4444;">85</span></li>
-        <li class="funnel-item"><span class="funnel-label">🚫 解約</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:7%;background:#dc2626;"></div></div><span class="funnel-count" style="color:#dc2626;">6</span></li>
-        <li class="funnel-item"><span class="funnel-label">📦 solution引渡し</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%;background:#64748b;"></div></div><span class="funnel-count" style="color:var(--text2);">12</span></li>
+        <li class="funnel-item"><span class="funnel-label">🔵 アプローチ中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:52%;background:#334155"></div></div><span class="funnel-count" style="color:var(--text2)">97</span></li>
+        <li class="funnel-item"><span class="funnel-label">🌀 長期フォロー</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#2a3f5f"></div></div><span class="funnel-count" style="color:var(--text2)">180</span></li>
+        <li class="funnel-item"><span class="funnel-label">🟡 進行中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:11%;background:#00b4d8"></div></div><span class="funnel-count" style="color:var(--teal)">9</span></li>
+        <li class="funnel-item"><span class="funnel-label">💬 商談後検討中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:7%;background:#00b4d8"></div></div><span class="funnel-count" style="color:var(--teal)">6</span></li>
+        <li class="funnel-item"><span class="funnel-label" style="color:#a855f7">🗓 初回商談確定 <span style="font-size:9px;background:rgba(168,85,247,.25);padding:1px 5px;border-radius:8px;margin-left:3px">+2 NEW</span></span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3%;background:#a855f7"></div></div><span class="funnel-count" style="color:#a855f7">2</span></li>
+        <li class="funnel-item"><span class="funnel-label" style="color:var(--teal)">🧪 トライアル予定/調整中 <span style="font-size:9px;background:rgba(34,197,94,.25);color:var(--green);padding:1px 5px;border-radius:8px;margin-left:3px">+2</span></span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:13%;background:#0096c7"></div></div><span class="funnel-count" style="color:var(--teal)">11</span></li>
+        <li class="funnel-item"><span class="funnel-label">⚗️ トライアル中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2%;background:#0096c7"></div></div><span class="funnel-count" style="color:var(--teal)">1</span></li>
+        <li class="funnel-item"><span class="funnel-label">📤 トライアル終了後_追客</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:6%;background:#0096c7"></div></div><span class="funnel-count" style="color:var(--teal)">5</span></li>
+        <li class="funnel-item"><span class="funnel-label">🔧 カスタマイズ商談</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2%;background:var(--gold)"></div></div><span class="funnel-count" style="color:var(--gold)">1</span></li>
+        <li class="funnel-item"><span class="funnel-label" style="color:var(--pink)">🏢 大型提案（OEM・組織横断）<span style="font-size:9px;background:rgba(236,72,153,.25);padding:1px 5px;border-radius:8px;margin-left:3px">NEW</span></span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2%;background:var(--pink)"></div></div><span class="funnel-count" style="color:var(--pink)">1</span></li>
+        <li class="funnel-item"><span class="funnel-label">✅ 継続利用中</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%;background:var(--green)"></div></div><span class="funnel-count" style="color:var(--green)">12</span></li>
+        <li class="funnel-item"><span class="funnel-label">❌ 失注</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:48%;background:#ef4444"></div></div><span class="funnel-count" style="color:#ef4444">85</span></li>
+        <li class="funnel-item"><span class="funnel-label">🚫 解約</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:7%;background:#dc2626"></div></div><span class="funnel-count" style="color:#dc2626">6</span></li>
+        <li class="funnel-item"><span class="funnel-label">📦 solution引渡し</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%;background:#64748b"></div></div><span class="funnel-count" style="color:var(--text2)">12</span></li>
       </ul>
     </div>
-
     <div class="chart-card">
-      <h3>チャネル別 件数（全423件）</h3>
+      <h3>チャネル別 件数（全426件）</h3>
       <div class="chart-wrap h300"><canvas id="channelChart"></canvas></div>
     </div>
   </div>
 
-  <!-- 導入確度 / 想定プラン / 商談先部署 -->
   <p class="section-title mb-20">導入確度 ／ 想定プラン ／ 商談先部署</p>
   <div class="three-col mb-20">
     <div class="chart-card"><h3>導入確度</h3><div class="chart-wrap h220"><canvas id="confidenceChart"></canvas></div></div>
@@ -305,24 +229,14 @@
     <div class="chart-card"><h3>商談先部署</h3><div class="chart-wrap h220"><canvas id="deptChart"></canvas></div></div>
   </div>
 
-  <!-- 対象法令 / 新機能後受注確度 / パートナー -->
   <p class="section-title mb-20">対象法令 TOP ／ 新機能後受注確度 ／ パートナー別</p>
   <div class="three-col mb-20">
-
-    <div class="chart-card">
-      <h3>対象法令 TOP（複数選択・フラット展開）</h3>
-      <div class="chart-wrap h220"><canvas id="lawChart"></canvas></div>
-    </div>
-
-    <div class="chart-card">
-      <h3>新機能開発後 受注確度（入力済みのみ）</h3>
-      <div class="chart-wrap h220"><canvas id="newFuncChart"></canvas></div>
-    </div>
-
+    <div class="chart-card"><h3>対象法令 TOP（複数選択・フラット展開）</h3><div class="chart-wrap h220"><canvas id="lawChart"></canvas></div></div>
+    <div class="chart-card"><h3>新機能開発後 受注確度（入力済みのみ）</h3><div class="chart-wrap h220"><canvas id="newFuncChart"></canvas></div></div>
     <div class="chart-card">
       <h3>パートナー先 別 件数</h3>
-      <div style="margin-top:6px;">
-        <div class="pill-grid" style="margin-bottom:11px;">
+      <div style="margin-top:6px">
+        <div class="pill-grid" style="margin-bottom:11px">
           <span class="pill">DGBT <span class="pill-count">4</span></span>
           <span class="pill">SGS <span class="pill-count">2</span></span>
           <span class="pill">後藤さん <span class="pill-count">1</span></span>
@@ -337,56 +251,101 @@
     </div>
   </div>
 
-  <!-- 高確度アクティブ案件リスト -->
-  <p class="section-title mb-20">高確度アクティブ案件リスト（新機能後受注確度：可能性:高）</p>
+  <p class="section-title mb-20">🏢 大型提案案件（OEM・組織横断）</p>
   <div class="chart-card mb-20">
-    <div style="overflow-x:auto;">
+    <div style="overflow-x:auto">
       <table class="data-table">
-        <thead><tr><th>#</th><th>会社名</th><th>ステータス</th><th>新機能後受注確度</th><th>想定プラン</th><th>年間想定予算</th><th>チャネル</th></tr></thead>
+        <thead><tr><th>会社名</th><th>ステータス</th><th>特記事項</th><th>対象法令</th><th>想定プラン</th><th>チャネル</th></tr></thead>
         <tbody>
-          <tr><td style="color:var(--text2);">1</td><td>株式会社コロワイド</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>—</td><td style="color:var(--text2);">未入力</td><td>LP_資料請求</td></tr>
-          <tr><td style="color:var(--text2);">2</td><td>LIXIL</td><td><span class="status-tag st-active">進行中</span></td><td><span class="conf-high">可能性:高</span></td><td>Pro/customize</td><td style="color:var(--text2);">未入力</td><td>—</td></tr>
-          <tr><td style="color:var(--text2);">3</td><td>阪急阪神マーケティングソリューションズ</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>—</td><td style="color:var(--text2);">未入力</td><td>—</td></tr>
-          <tr><td style="color:var(--text2);">4</td><td>伊藤忠リーテイルリンク㈱</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>Enterprise</td><td style="color:var(--text2);">未入力</td><td>—</td></tr>
-          <tr><td style="color:var(--text2);">5</td><td>JPコミュニケーションズ㈱</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>—</td><td style="color:var(--text2);">未入力</td><td>LP_資料請求</td></tr>
-          <tr><td style="color:var(--text2);">6</td><td>アシックスジャパン㈱案件</td><td><span class="status-tag st-custom">カスタマイズ商談</span></td><td><span class="conf-high">可能性:高</span></td><td>未定</td><td style="color:var(--text2);">¥0</td><td>Web広告</td></tr>
-          <tr><td style="color:var(--text2);">7</td><td>株式会社エスコン</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>未定</td><td style="color:var(--text2);">¥0</td><td>LP_資料請求</td></tr>
-          <tr><td style="color:var(--text2);">8</td><td>㈱電通名鉄コミュニケーションズ</td><td><span class="status-tag st-follow">トライアル終了後_追客</span></td><td><span class="conf-high">可能性:高</span></td><td>未定</td><td style="color:var(--text2);">¥0</td><td>LP_資料請求</td></tr>
-          <tr><td style="color:var(--text2);">9</td><td>株式会社MTG</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>未定</td><td style="color:var(--text2);">未入力</td><td>セミナー</td></tr>
-          <tr><td style="color:var(--text2);">10</td><td>株式会社ポーラ</td><td><span class="status-tag st-custom">カスタマイズ商談</span></td><td><span class="conf-high">可能性:高</span></td><td>Standard</td><td style="color:var(--text2);">¥0</td><td>LP_資料請求</td></tr>
+          <tr class="oem-row">
+            <td><strong>アシックスジャパン株式会社案件</strong></td>
+            <td><span class="st-oem status-tag">大型提案</span></td>
+            <td style="color:var(--pink)">スポーツ公正競争規約対応 / OEM提供・カスタムプロンプト開発中 / 新機能後:可能性:高</td>
+            <td style="color:var(--text2)">景表法 + スポーツ公正競争規約</td>
+            <td>未定</td>
+            <td>Web広告</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <div class="note">高確度案件10社の年間想定予算はすべて未入力または¥0。次商談での予算ヒアリングを推奨。</div>
+    <div class="note" style="border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.06);color:var(--pink)">大型提案はOEM提供や組織横断的な案件が対象。受注時のARRインパクトは通常案件を大幅に上回る可能性があります。</div>
   </div>
 
-  <!-- 最新ステータス変更 -->
-  <p class="section-title mb-20">📋 最新登録・ステータス変更案件（2026-06-15 更新分）</p>
+  <p class="section-title mb-20">高確度アクティブ案件リスト（新機能後受注確度：可能性:高）</p>
   <div class="chart-card mb-20">
-    <div style="overflow-x:auto;">
+    <div style="overflow-x:auto">
       <table class="data-table">
-        <thead><tr><th>会社名</th><th>変更前</th><th>変更後</th><th>登録日</th><th>メモ</th></tr></thead>
+        <thead><tr><th>#</th><th>会社名</th><th>ステータス</th><th>新機能後受注確度</th><th>想定プラン</th><th>チャネル</th></tr></thead>
         <tbody>
+          <tr class="oem-row"><td style="color:var(--pink)">★</td><td><strong>アシックスジャパン㈱</strong></td><td><span class="st-oem status-tag">大型提案</span></td><td><span class="conf-high">可能性:高</span></td><td>未定</td><td>Web広告</td></tr>
+          <tr><td style="color:var(--text2)">1</td><td>株式会社コロワイド</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>—</td><td>LP_資料請求</td></tr>
+          <tr><td style="color:var(--text2)">2</td><td>LIXIL</td><td><span class="status-tag st-active">進行中</span></td><td><span class="conf-high">可能性:高</span></td><td>Pro/customize</td><td>—</td></tr>
+          <tr><td style="color:var(--text2)">3</td><td>阪急阪神マーケティングソリューションズ</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>—</td><td>—</td></tr>
+          <tr><td style="color:var(--text2)">4</td><td>伊藤忠リーテイルリンク㈱</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>Enterprise</td><td>—</td></tr>
+          <tr><td style="color:var(--text2)">5</td><td>JPコミュニケーションズ㈱</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>—</td><td>LP_資料請求</td></tr>
+          <tr><td style="color:var(--text2)">6</td><td>株式会社エスコン</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>未定</td><td>LP_資料請求</td></tr>
+          <tr><td style="color:var(--text2)">7</td><td>㈱電通名鉄コミュニケーションズ</td><td><span class="status-tag st-follow">トライアル終了後_追客</span></td><td><span class="conf-high">可能性:高</span></td><td>未定</td><td>LP_資料請求</td></tr>
+          <tr><td style="color:var(--text2)">8</td><td>株式会社MTG</td><td><span class="status-tag st-trial">トライアル予定</span></td><td><span class="conf-high">可能性:高</span></td><td>未定</td><td>セミナー</td></tr>
+          <tr><td style="color:var(--text2)">9</td><td>株式会社ポーラ</td><td><span class="status-tag st-custom">カスタマイズ商談</span></td><td><span class="conf-high">可能性:高</span></td><td>Standard</td><td>LP_資料請求</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="section-title mb-20">📋 最新登録・ステータス変更案件（2026-06-18 更新分）</p>
+  <div class="chart-card mb-20">
+    <div style="overflow-x:auto">
+      <table class="data-table">
+        <thead><tr><th>会社名</th><th>変更前</th><th>変更後</th><th>日付</th><th>メモ</th></tr></thead>
+        <tbody>
+          <tr class="oem-row">
+            <td><strong>🏢 アシックスジャパン㈱</strong></td>
+            <td><span class="status-tag st-custom">カスタマイズ商談</span></td>
+            <td><span class="st-oem status-tag">大型提案</span></td>
+            <td>6/18</td>
+            <td style="color:var(--pink)">OEM提供・組織横断型 / スポーツ公正競争規約対応 / 新機能後:可能性:高</td>
+          </tr>
           <tr class="hot-row">
-            <td><strong>🔥 イオンペット株式会社</strong></td>
-            <td><span class="status-tag st-first">初回商談確定</span></td>
-            <td><span class="status-tag st-active">進行中</span></td>
-            <td>6/10 商談実施</td>
-            <td style="color:var(--green);font-weight:700;">月800回・月額26〜29万見積中・次回6/18</td>
+            <td><strong>🎉 株式会社アリミノ</strong></td>
+            <td><span class="st-first status-tag">初回商談確定</span></td>
+            <td><span class="status-tag st-trial">トライアル予定</span></td>
+            <td>6/16 商談実施</td>
+            <td style="color:var(--green)">Standard想定 / 2026年9月導入予定（期変わりのタイミング）/ 新機能後:可能性:あり</td>
           </tr>
           <tr>
-            <td><strong>ヘッドオフィスジャパン㈱</strong></td>
-            <td><span class="status-tag" style="background:rgba(148,163,184,.2);color:var(--text2);">アプローチ中</span></td>
+            <td><strong>イオンペット株式会社</strong></td>
             <td><span class="status-tag st-active">進行中</span></td>
-            <td>2026-06-02</td>
-            <td style="color:var(--text2);">藤原様担当 / 2027年9月開始予定</td>
+            <td><span class="status-tag st-trial">トライアル予定</span></td>
+            <td>6/18後</td>
+            <td style="color:var(--teal)">月800回 / 月額26〜29万円見積後 / トライアルへ</td>
           </tr>
           <tr>
-            <td><strong>ポノテク株式会社</strong></td>
-            <td style="color:var(--text2);">（新規）</td>
-            <td><span class="status-tag" style="background:rgba(148,163,184,.2);color:var(--text2);">アプローチ中</span></td>
-            <td>2026-06-08</td>
-            <td style="color:var(--text2);">LP_資料請求</td>
+            <td><strong>株式会社Tver</strong></td>
+            <td><span class="status-tag st-trial">トライアル中</span></td>
+            <td><span class="status-tag st-follow">トライアル終了後_追客</span></td>
+            <td>6/18</td>
+            <td style="color:var(--text2)">新機能後:可能性:あり</td>
+          </tr>
+          <tr>
+            <td><strong>🆕 株式会社ゆうちょ銀行</strong></td>
+            <td style="color:var(--text2)">（新規）</td>
+            <td><span class="st-first status-tag">初回商談確定</span></td>
+            <td>6/17 登録</td>
+            <td style="color:#a855f7">金融 / 金商法・景表法 / 担当:合田</td>
+          </tr>
+          <tr>
+            <td><strong>🆕 天藤製薬株式会社</strong></td>
+            <td style="color:var(--text2)">（新規）</td>
+            <td><span class="st-first status-tag">初回商談確定</span></td>
+            <td>6/16 登録</td>
+            <td style="color:#a855f7">医薬品・製薬 / 景表法・薬機法 / 初回商談:6/23</td>
+          </tr>
+          <tr>
+            <td><strong>🆕 株式会社Brushup</strong></td>
+            <td style="color:var(--text2)">（新規）</td>
+            <td><span class="status-tag" style="background:rgba(148,163,184,.2);color:var(--text2)">アプローチ中</span></td>
+            <td>6/16 登録</td>
+            <td style="color:var(--text2)">コンテンツマーケ / 担当:中川</td>
           </tr>
         </tbody>
       </table>
@@ -395,59 +354,25 @@
 
 </div>
 
-<!-- CHARTS -->
 <script>
-Chart.defaults.color = '#94a3b8';
-Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
-const TEAL='#00b4d8', GREEN='#22c55e', GOLD='#f4c842', RED='#ef4444', SLATE='#64748b';
+Chart.defaults.color='#94a3b8';Chart.defaults.borderColor='rgba(255,255,255,0.06)';
+const TEAL='#00b4d8',GREEN='#22c55e',GOLD='#f4c842',RED='#ef4444',SLATE='#64748b',PINK='#ec4899';
 
-new Chart(document.getElementById('planChart'), {
-  type:'doughnut',
-  data:{ labels:['Enterprise','Standard','Starter','保守'], datasets:[{ data:[390000,385000,175000,30000], backgroundColor:[GOLD,TEAL,GREEN,SLATE], borderWidth:2, borderColor:'#1a2744' }] },
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ font:{size:11}, padding:10 } }, tooltip:{ callbacks:{ label:ctx=>`¥${ctx.parsed.toLocaleString()}/月` } } } }
-});
+new Chart(document.getElementById('planChart'),{type:'doughnut',data:{labels:['Enterprise','Standard','Starter','保守'],datasets:[{data:[390000,385000,175000,30000],backgroundColor:[GOLD,TEAL,GREEN,SLATE],borderWidth:2,borderColor:'#1a2744'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},padding:10}},tooltip:{callbacks:{label:ctx=>`¥${ctx.parsed.toLocaleString()}/月`}}}}});
 
-new Chart(document.getElementById('channelChart'), {
-  type:'bar',
-  data:{ labels:['LP_資料請求','Web広告','セミナー','顧問','紹介','パートナー','営業代行','展示会'], datasets:[{ label:'件数', data:[129,103,60,24,17,13,11,5], backgroundColor:['rgba(0,180,216,.75)','rgba(34,197,94,.75)','rgba(244,200,66,.75)','rgba(168,85,247,.75)','rgba(249,115,22,.75)','rgba(236,72,153,.75)','rgba(100,116,139,.75)','rgba(6,182,212,.75)'], borderRadius:5, borderWidth:0 }] },
-  options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ font:{size:11} } }, y:{ ticks:{ font:{size:11} } } } }
-});
+new Chart(document.getElementById('channelChart'),{type:'bar',data:{labels:['LP_資料請求','Web広告','セミナー','顧問','紹介','パートナー','営業代行','展示会'],datasets:[{label:'件数',data:[130,104,60,24,17,13,11,5],backgroundColor:['rgba(0,180,216,.75)','rgba(34,197,94,.75)','rgba(244,200,66,.75)','rgba(168,85,247,.75)','rgba(249,115,22,.75)','rgba(236,72,153,.75)','rgba(100,116,139,.75)','rgba(6,182,212,.75)'],borderRadius:5,borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{font:{size:11}}},y:{ticks:{font:{size:11}}}}}});
 
-new Chart(document.getElementById('confidenceChart'), {
-  type:'doughnut',
-  data:{ labels:['D: 情報収集','C: 導入予定','B: 条件次第','A: 契約前提','契約/受注','未設定'], datasets:[{ data:[268,31,12,5,8,99], backgroundColor:[SLATE,'#0ea5e9','#3b82f6',GREEN,GOLD,'rgba(255,255,255,0.1)'], borderWidth:2, borderColor:'#1a2744' }] },
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, padding:6 } } } }
-});
+new Chart(document.getElementById('confidenceChart'),{type:'doughnut',data:{labels:['D: 情報収集','C: 導入予定','B: 条件次第','A: 契約前提','契約/受注','未設定'],datasets:[{data:[268,32,13,5,8,100],backgroundColor:[SLATE,'#0ea5e9','#3b82f6',GREEN,GOLD,'rgba(255,255,255,.1)'],borderWidth:2,borderColor:'#1a2744'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:6}}}}});
 
-new Chart(document.getElementById('planExpectedChart'), {
-  type:'doughnut',
-  data:{ labels:['未定','Standard','Starter','Enterprise','Pro/customize'], datasets:[{ data:[324,18,18,10,7], backgroundColor:[SLATE,TEAL,GREEN,GOLD,'#a855f7'], borderWidth:2, borderColor:'#1a2744' }] },
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, padding:6 } } } }
-});
+new Chart(document.getElementById('planExpectedChart'),{type:'doughnut',data:{labels:['未定','Standard','Starter','Enterprise','Pro/customize'],datasets:[{data:[325,19,18,10,7],backgroundColor:[SLATE,TEAL,GREEN,GOLD,'#a855f7'],borderWidth:2,borderColor:'#1a2744'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:6}}}}});
 
-new Chart(document.getElementById('deptChart'), {
-  type:'doughnut',
-  data:{ labels:['審査系部署','全体管理部署','制作系部署','経営層','無関係部署','未設定'], datasets:[{ data:[27,11,9,3,1,372], backgroundColor:[TEAL,GREEN,GOLD,'#a855f7',RED,'rgba(255,255,255,0.08)'], borderWidth:2, borderColor:'#1a2744' }] },
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, padding:6 } } } }
-});
+new Chart(document.getElementById('deptChart'),{type:'doughnut',data:{labels:['審査系部署','全体管理部署','制作系部署','経営層','無関係部署','未設定'],datasets:[{data:[27,11,9,3,1,375],backgroundColor:[TEAL,GREEN,GOLD,'#a855f7',RED,'rgba(255,255,255,.08)'],borderWidth:2,borderColor:'#1a2744'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:6}}}}});
 
-new Chart(document.getElementById('lawChart'), {
-  type:'bar',
-  data:{ labels:['景表法','薬機法','医療広告GL','宅建業法','食品表示法','健康増進法','保険業法'], datasets:[{ label:'件数', data:[107,80,20,9,8,8,5], backgroundColor:['rgba(0,180,216,.8)','rgba(34,197,94,.8)','rgba(244,200,66,.8)','rgba(168,85,247,.8)','rgba(249,115,22,.8)','rgba(6,182,212,.8)','rgba(236,72,153,.8)'], borderRadius:5, borderWidth:0 }] },
-  options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ font:{size:11} } }, y:{ ticks:{ font:{size:11} } } } }
-});
+new Chart(document.getElementById('lawChart'),{type:'bar',data:{labels:['景表法','薬機法','医療広告GL','宅建業法','食品表示法','健康増進法','保険業法','金商法'],datasets:[{label:'件数',data:[108,81,20,9,8,8,5,2],backgroundColor:['rgba(0,180,216,.8)','rgba(34,197,94,.8)','rgba(244,200,66,.8)','rgba(168,85,247,.8)','rgba(249,115,22,.8)','rgba(6,182,212,.8)','rgba(236,72,153,.8)','rgba(99,102,241,.8)'],borderRadius:5,borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{font:{size:11}}},y:{ticks:{font:{size:11}}}}}});
 
-new Chart(document.getElementById('newFuncChart'), {
-  type:'doughnut',
-  data:{ labels:['可能性:高','可能性:あり','不明','可能性なし'], datasets:[{ data:[13,12,31,2], backgroundColor:[RED,GOLD,SLATE,'#374151'], borderWidth:2, borderColor:'#1a2744' }] },
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:8 } }, tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ${ctx.parsed}件（入力済み58件中）` } } } }
-});
+new Chart(document.getElementById('newFuncChart'),{type:'doughnut',data:{labels:['可能性:高','可能性:あり','不明','可能性なし'],datasets:[{data:[13,13,31,2],backgroundColor:[RED,GOLD,SLATE,'#374151'],borderWidth:2,borderColor:'#1a2744'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:8}},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed}件`}}}}});
 
-new Chart(document.getElementById('partnerChart'), {
-  type:'bar',
-  data:{ labels:['DGBT','SGS','後藤さん','狩野さん','森本さん','各務さん','松崎さん','Acrove'], datasets:[{ label:'件数', data:[4,2,1,1,1,1,1,1], backgroundColor:'rgba(0,180,216,0.75)', borderRadius:5, borderWidth:0 }] },
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ font:{size:10} } }, y:{ ticks:{ stepSize:1, font:{size:11} }, grid:{ color:'rgba(255,255,255,.05)' } } } }
-});
+new Chart(document.getElementById('partnerChart'),{type:'bar',data:{labels:['DGBT','SGS','後藤さん','狩野さん','森本さん','各務さん','松崎さん','Acrove'],datasets:[{label:'件数',data:[4,2,1,1,1,1,1,1],backgroundColor:'rgba(0,180,216,0.75)',borderRadius:5,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{stepSize:1,font:{size:11}},grid:{color:'rgba(255,255,255,.05)'}}}}});
 </script>
 </body>
 </html>
